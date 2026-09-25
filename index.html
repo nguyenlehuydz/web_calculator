@@ -15,7 +15,11 @@
   <main class="calculator" role="application" aria-label="Máy tính">
 
     <header class="calc-header">
-      <span class="brand">Calc<span class="brand-dot">.</span></span>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <button class="icon-btn" id="menuToggle">☰</button>
+        <span class="brand">Calc<span class="brand-dot">.</span></span>
+      </div>
+
       <div class="header-actions">
         <button class="icon-btn" id="historyToggle" title="Lịch sử" aria-label="Xem lịch sử">
           <svg viewBox="0 0 24 24" width="18" height="18"><path d="M13 3a9 9 0 1 0 8.94 10H19.9A7 7 0 1 1 13 5v4l5-4.5L13 0v3z" fill="currentColor"/></svg>
@@ -25,6 +29,14 @@
         </button>
       </div>
     </header>
+
+    <!-- Menu chọn chế độ (Ẩn mặc định) -->
+    <div class="mode-menu" id="modeMenu">
+      <button class="mode-btn active" data-mode="standard">Tiêu chuẩn</button>
+      <button class="mode-btn" data-mode="scientific">Khoa học</button>
+      <button class="mode-btn" data-mode="programmer">Lập trình viên</button>
+      <button class="mode-btn" data-mode="converter">Chuyển đổi Đơn vị</button>
+    </div>
 
     <section class="display" aria-live="polite">
       <div class="memory-tag" id="memoryTag">M</div>
@@ -50,33 +62,74 @@
       </ul>
     </aside>
 
-    <section class="keypad">
+    <section class="keypad" id="keypad-standard">
       <button class="key key-mem" data-action="mem-clear">MC</button>
       <button class="key key-mem" data-action="mem-recall">MR</button>
       <button class="key key-mem" data-action="mem-add">M+</button>
       <button class="key key-mem" data-action="mem-sub">M-</button>
-
       <button class="key key-fn" data-action="clear">AC</button>
       <button class="key key-fn" data-action="delete">DEL</button>
       <button class="key key-fn" data-action="percent">%</button>
       <button class="key key-op" data-op="÷">÷</button>
-
       <button class="key key-num" data-num="7">7</button>
       <button class="key key-num" data-num="8">8</button>
       <button class="key key-num" data-num="9">9</button>
       <button class="key key-op" data-op="×">×</button>
-
       <button class="key key-num" data-num="4">4</button>
       <button class="key key-num" data-num="5">5</button>
       <button class="key key-num" data-num="6">6</button>
       <button class="key key-op" data-op="−">−</button>
-
       <button class="key key-num" data-num="1">1</button>
       <button class="key key-num" data-num="2">2</button>
       <button class="key key-num" data-num="3">3</button>
       <button class="key key-op" data-op="+">+</button>
-
       <button class="key key-num key-zero" data-num="0">0</button>
+      <button class="key key-num" data-num=".">.</button>
+      <button class="key key-equals" data-action="equals">=</button>
+    </section>
+
+    <!-- BÀN PHÍM KHOA HỌC (5 Cột, ẩn mặc định) -->
+    <section class="keypad" id="keypad-scientific" style="display: none; grid-template-columns: repeat(5, 1fr);">
+      <!-- Hàng 1 -->
+      <button class="key key-sci">2nd</button>
+      <button class="key key-sci">π</button>
+      <button class="key key-sci">e</button>
+      <button class="key key-fn" data-action="clear">C</button>
+      <button class="key key-fn" data-action="delete">⌫</button>
+      <!-- Hàng 2 -->
+      <button class="key key-sci">x²</button>
+      <button class="key key-sci">1/x</button>
+      <button class="key key-sci">|x|</button>
+      <button class="key key-sci">exp</button>
+      <button class="key key-sci">mod</button>
+      <!-- Hàng 3 -->
+      <button class="key key-sci">√x</button>
+      <button class="key key-sci">(</button>
+      <button class="key key-sci">)</button>
+      <button class="key key-sci">n!</button>
+      <button class="key key-op" data-op="÷">÷</button>
+      <!-- Hàng 4 -->
+      <button class="key key-sci">xʸ</button>
+      <button class="key key-num" data-num="7">7</button>
+      <button class="key key-num" data-num="8">8</button>
+      <button class="key key-num" data-num="9">9</button>
+      <button class="key key-op" data-op="×">×</button>
+      <!-- Hàng 5 -->
+      <button class="key key-sci">10ˣ</button>
+      <button class="key key-num" data-num="4">4</button>
+      <button class="key key-num" data-num="5">5</button>
+      <button class="key key-num" data-num="6">6</button>
+      <button class="key key-op" data-op="−">−</button>
+      <!-- Hàng 6 -->
+      <button class="key key-sci">log</button>
+      <button class="key key-num" data-num="1">1</button>
+      <button class="key key-num" data-num="2">2</button>
+      <button class="key key-num" data-num="3">3</button>
+      <button class="key key-op" data-op="+">+</button>
+      <!-- Hàng 7 -->
+      <button class="key key-sci">ln</button>
+      <button class="key key-sci">+/-</button>
+      <button class="key key-num" data-num="0">0</button>
       <button class="key key-num" data-num=".">.</button>
       <button class="key key-equals" data-action="equals">=</button>
     </section>

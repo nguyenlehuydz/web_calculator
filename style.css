@@ -368,3 +368,49 @@ body {
     opacity: 0;
   }
 }
+
+/* Quản lý menu chế độ */
+.mode-menu {
+  display: none; /* Ẩn mặc định */
+  flex-direction: column;
+  background: var(--surface-2);
+  border-radius: 12px;
+  padding: 8px;
+  margin-bottom: 12px;
+}
+.mode-menu.show { display: flex; }
+.mode-btn {
+  background: transparent; border: none; color: var(--text-main);
+  padding: 10px; text-align: left; cursor: pointer; border-radius: 8px;
+}
+.mode-btn:hover { background: var(--surface); }
+.mode-btn.active { color: var(--amber); font-weight: bold; }
+
+/* Trạng thái ẩn hiện của các phím mở rộng */
+.advanced-key { display: none; }
+
+/* CSS khi kích hoạt Chế độ Khoa học */
+.key-sci {
+  background: var(--surface-2);
+  color: var(--text-main);
+  font-size: 14px;
+}
+.key-sci:hover {
+  filter: brightness(1.2);
+}
+
+/* Ẩn phím 0 to (chiếm 2 cột) ở chế độ khoa học để không phá lưới 5 cột */
+#keypad-scientific .key-zero {
+  grid-column: span 1;
+}
+
+/* Đảm bảo keypad hỗ trợ hiển thị dạng lưới khi được gọi */
+.grid-active {
+  display: grid !important;
+}
+
+/* CSS khi kích hoạt Chế độ Lập trình */
+.calculator.mode-programmer .keypad {
+  grid-template-columns: repeat(5, 1fr); 
+}
+.calculator.mode-programmer .key-prog { display: block; }

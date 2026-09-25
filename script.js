@@ -10,9 +10,15 @@
   const themeToggle = document.getElementById('themeToggle');
   const copyBtn = document.getElementById('copyBtn');
   const memoryTag = document.getElementById('memoryTag');
-
+  const menuToggle = document.getElementById('menuToggle');
+  const modeMenu = document.getElementById('modeMenu');
+  const calculatorDisplay = document.querySelector('.calculator');
   const OP_MAP = { '+': '+', '−': '-', '×': '*', '÷': '/' };
   const MAX_DIGITS = 14;
+
+  // Trỏ tới 2 bàn phím khác nhau
+  const keypadStandard = document.getElementById('keypad-standard');
+  const keypadScientific = document.getElementById('keypad-scientific');
 
   let current = '0';
   let previous = null;
@@ -20,36 +26,44 @@
   let overwrite = true;
   let memory = 0;
   let history = [];
-  const clickSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
-  clickSound.volume = 0.5;
+  const clickSound = new Audio('click_2.mp3');
+  clickSound.volume = 0.6; 
 
   function createRipple(e, button) {
-    // Phát âm thanh
-    clickSound.currentTime = 0;
-    clickSound.play().catch(() => {}); // Catch lỗi autoplay của trình duyệt
+    // 1. Chạy âm thanh an toàn
+    try {
+      clickSound.currentTime = 0;
+      clickSound.play().catch(() => {
+      });
+    } catch (err) {}
 
-    // Tạo gợn sóng hình ảnh
+    // 2. Tạo hình ảnh gợn sóng
     const circle = document.createElement('span');
     const diameter = Math.max(button.clientWidth, button.clientHeight);
     const radius = diameter / 2;
     
+    // Tính toán vị trí chuột click để tâm gợn sóng xuất phát đúng chỗ
     const rect = button.getBoundingClientRect();
     circle.style.width = circle.style.height = `${diameter}px`;
     circle.style.left = `${e.clientX - rect.left - radius}px`;
     circle.style.top = `${e.clientY - rect.top - radius}px`;
     circle.classList.add('ripple');
     
+    // Xóa gợn sóng cũ đang chạy lở dở (nếu bấm quá nhanh)
     const existingRipple = button.querySelector('.ripple');
     if (existingRipple) existingRipple.remove();
     
     button.appendChild(circle);
+
+    // 3. QUAN TRỌNG: Tự động xóa thẻ span sau 500ms (bằng thời gian animation)
+    // Nếu không xóa, web sẽ bị tràn ngập thẻ span rác gây lag
+    setTimeout(() => {
+      circle.remove();
+    }, 500);
   }
 
   // Bắt sự kiện mousedown trên toàn bộ keypad để kích hoạt hiệu ứng nhanh nhất
-  keypad.addEventListener('mousedown', (e) => {
-    const btn = e.target.closest('.key');
-    if (btn) createRipple(e, btn);
-  });
+
 
   function formatNumber(numStr) {
     if (numStr === 'Lỗi') return numStr;
@@ -134,6 +148,7 @@
     updateDisplay();
   }
 
+
   function deleteLast() {
     if (current === 'Lỗi' || overwrite) { resetAll(false); return; }
     current = current.length > 1 ? current.slice(0, -1) : '0';
@@ -204,29 +219,70 @@
     }
   });
 
-  keypad.addEventListener('click', (e) => {
-    const btn = e.target.closest('.key');
-    if (!btn) return;
-    const { num, op, action } = btn.dataset;
-    if (num !== undefined) return inputDigit(num);
-    if (op !== undefined) return chooseOperator(op);
-    switch (action) {
-      case 'clear': return resetAll(true);
-      case 'delete': return deleteLast();
-      case 'percent': return percent();
-      case 'equals': return compute();
-      case 'mem-clear': memory = 0; return updateDisplay();
-      case 'mem-recall':
-        current = String(memory);
-        overwrite = true;
-        return updateDisplay();
-      case 'mem-add':
-        memory += parseFloat(current || '0');
-        return updateDisplay();
-      case 'mem-sub':
-        memory -= parseFloat(current || '0');
-        return updateDisplay();
-    }
+  menuToggle.addEventListener('click', () => {
+    modeMenu.classList.toggle('show');
+  });
+
+  document.querySelectorAll('.mode-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+      e.target.classList.add('active');
+      
+      const mode = e.target.dataset.mode;
+      
+      // Xử lý chuyển đổi bàn phím
+      if (mode === 'scientific') {
+        keypadStandard.style.display = 'none';
+        keypadScientific.style.display = 'grid'; // Kích hoạt lưới 5x7
+      } else if (mode === 'standard') {
+        keypadStandard.style.display = 'grid'; // Trở lại lưới 4 cột
+        keypadScientific.style.display = 'none';
+      }
+      
+      modeMenu.classList.remove('show');
+      resetAll(true); 
+    });
+  });
+
+  // Bắt sự kiện tạo hiệu ứng âm thanh cho TOÀN BỘ nút trên máy tính (sửa lại event)
+  document.querySelectorAll('.keypad').forEach(pad => {
+    
+    // 1. GỌI HIỆU ỨNG GỢN SÓNG VÀ ÂM THANH KHI NHẤN CHUỘT XUỐNG
+    pad.addEventListener('mousedown', (e) => {
+      const btn = e.target.closest('.key');
+      if (btn) createRipple(e, btn);
+    });
+    
+    // 2. GỌI LOGIC TÍNH TOÁN KHI NHẢ CHUỘT LÊN (CLICK)
+    pad.addEventListener('click', (e) => {
+      const btn = e.target.closest('.key');
+      if (!btn) return;
+      
+      const { num, op, action } = btn.dataset;
+      
+      if (num !== undefined) return inputDigit(num);
+      if (op !== undefined) return chooseOperator(op);
+      
+      switch (action) {
+        case 'clear': return resetAll(true);
+        case 'delete': return deleteLast();
+        case 'percent': return percent();
+        case 'equals': return compute();
+        case 'mem-clear': 
+          memory = 0; 
+          return updateDisplay();
+        case 'mem-recall':
+          current = String(memory);
+          overwrite = true;
+          return updateDisplay();
+        case 'mem-add':
+          memory += parseFloat(current || '0');
+          return updateDisplay();
+        case 'mem-sub':
+          memory -= parseFloat(current || '0');
+          return updateDisplay();
+      }
+    });
   });
 
   window.addEventListener('keydown', (e) => {
