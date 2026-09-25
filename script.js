@@ -58,6 +58,27 @@
     setTimeout(() => circle.remove(), 500);
   }
 
+  function adjustFontSize() {
+    const textLength = resultEl.textContent.length;
+    
+    // Nếu số lượng ký tự nhỏ hơn hoặc bằng 8 thì giữ nguyên cỡ chữ lớn (38px)
+    if (textLength <= 8) {
+      resultEl.style.fontSize = '38px';
+    } 
+    // Từ 9 đến 12 ký tự, giảm dần kích thước xuống 28px
+    else if (textLength <= 12) {
+      resultEl.style.fontSize = '28px';
+    } 
+    // Từ 13 đến 16 ký tự, giảm xuống 22px
+    else if (textLength <= 16) {
+      resultEl.style.fontSize = '22px';
+    } 
+    // Nếu quá dài (>16 ký tự), thu nhỏ tối đa còn 17px để hiển thị được chuỗi rất dài
+    else {
+      resultEl.style.fontSize = '17px';
+    }
+  }
+
   function formatNumber(numStr) {
     if (numStr === 'Lỗi') return numStr;
     const [intPart, decPart] = numStr.split('.');
@@ -99,6 +120,7 @@
 
   function updateDisplay() {
     resultEl.textContent = formatNumber(current);
+    adjustFontSize();
     if (operator && previous !== null) {
       expressionEl.textContent = `${formatNumber(previous)} ${symbolFor(operator)}`;
     } else {
@@ -214,6 +236,7 @@
 
   function updateSciDisplay() {
     resultEl.textContent = sciExpr === '' ? '0' : sciExpr;
+    adjustFontSize();
     const preview = sciExpr === '' ? null : sciEvaluateRaw(sciExpr);
     expressionEl.textContent = preview !== null ? `= ${formatNumber(String(preview))}` : '\u00A0';
     memoryTag.classList.toggle('active', memory !== 0);

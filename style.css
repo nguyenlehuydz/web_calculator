@@ -189,6 +189,7 @@ body {
   white-space: nowrap;
   max-width: 100%;
   scrollbar-width: none;
+  transition: font-size 0.15s ease;
 }
 .result::-webkit-scrollbar { display: none; }
 
