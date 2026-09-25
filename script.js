@@ -20,6 +20,36 @@
   let overwrite = true;
   let memory = 0;
   let history = [];
+  const clickSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
+  clickSound.volume = 0.5;
+
+  function createRipple(e, button) {
+    // Phát âm thanh
+    clickSound.currentTime = 0;
+    clickSound.play().catch(() => {}); // Catch lỗi autoplay của trình duyệt
+
+    // Tạo gợn sóng hình ảnh
+    const circle = document.createElement('span');
+    const diameter = Math.max(button.clientWidth, button.clientHeight);
+    const radius = diameter / 2;
+    
+    const rect = button.getBoundingClientRect();
+    circle.style.width = circle.style.height = `${diameter}px`;
+    circle.style.left = `${e.clientX - rect.left - radius}px`;
+    circle.style.top = `${e.clientY - rect.top - radius}px`;
+    circle.classList.add('ripple');
+    
+    const existingRipple = button.querySelector('.ripple');
+    if (existingRipple) existingRipple.remove();
+    
+    button.appendChild(circle);
+  }
+
+  // Bắt sự kiện mousedown trên toàn bộ keypad để kích hoạt hiệu ứng nhanh nhất
+  keypad.addEventListener('mousedown', (e) => {
+    const btn = e.target.closest('.key');
+    if (btn) createRipple(e, btn);
+  });
 
   function formatNumber(numStr) {
     if (numStr === 'Lỗi') return numStr;
