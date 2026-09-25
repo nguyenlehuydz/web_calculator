@@ -66,21 +66,18 @@
       resultEl.style.fontSize = '38px';
     } 
     // Từ 9 đến 12 ký tự, giảm dần kích thước xuống 28px
-    else if (textLength <= 12) {
+    else if (textLength <= 14) {
       resultEl.style.fontSize = '28px';
     } 
     // Từ 13 đến 16 ký tự, giảm xuống 22px
-    else if (textLength <= 16) {
+    else if (textLength <= 20) {
       resultEl.style.fontSize = '22px';
     } 
     // Nếu quá dài (>16 ký tự), thu nhỏ tối đa còn 17px để hiển thị được chuỗi rất dài
-    else if (textLength <= 20){
+    else if (textLength <= 24){
       resultEl.style.fontSize = '17px';
     }
-    else if (textLength <= 24){
-      resultEl.style.fontSize = '11px';
-    }
-    else resultEl.style.fontSize = '6px';
+    else resultEl.style.fontSize = '14px';
   }
 
   function formatNumber(numStr) {
