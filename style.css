@@ -1,26 +1,55 @@
 :root {
-  --bg-0: #0a1412;
-  --bg-1: #0f201d;
-  --surface: #16221f;
-  --surface-2: #1c2b28;
-  --border: rgba(255,255,255,0.07);
-  --display-bg: #081210;
-  --display-glow: rgba(245, 196, 81, 0.12);
-  --text-main: #e9efe9;
-  --text-dim: #6f8f86;
-  --amber: #f5c451;
-  --amber-text: #1a1608;
-  --emerald: #35a373;
-  --emerald-text: #06140d;
-  --steel: #2c4a52;
-  --steel-text: #cfe8e2;
-  --key-num-bg: #1f2e2c;
-  --key-num-text: #e7efe9;
-  --shadow-key: 0 2px 0 rgba(0,0,0,0.35), 0 6px 14px rgba(0,0,0,0.25);
+  /* NỀN CẢNH (BACKGROUND): Xanh dương rực rỡ, tươi sáng và trẻ trung */
+  --bg-0: #0052D4;       /* Xanh đại dương tươi tắn làm nền chính */
+  --bg-1: #6FB1FC;       /* Xanh da trời pha trắng ở góc hắt sáng */
+  
+  /* BỀ MẶT MÁY TÍNH: Xanh đậm hơn nền một chút để máy tính nổi bật lên */
+  --surface: #00378b;    
+  --surface-2: #0045ad;  /* Màu các nút phép toán */
+  --border: rgba(255, 255, 255, 0.15); 
+  
+  /* MÀN HÌNH HIỂN THỊ: Nền xanh đen sâu thẳm để làm nổi bật các con số */
+  --display-bg: #001B48; 
+  --display-glow: rgba(0, 255, 255, 0.25); /* Ánh sáng hắt màu Cyan rực rỡ */
+  
+  /* MÀU CHỮ & ĐIỂM NHẤN */
+  --text-main: #ffffff;  /* Trắng tinh khiết */
+  --text-dim: #9DBFFF;   /* Xanh lơ nhạt cho chữ ở các phím phụ */
+  --amber: #00FFFF;      /* Màu Cyan (xanh lơ dạ quang) cho con số, cực kỳ bắt mắt */
+  --amber-text: #002233;
+  --emerald: #00E676;    /* Nút '=' màu xanh lá cây dạ quang (Neon Green) tươi rói */
+  --emerald-text: #00331A;
+  --steel: #1A63C6;      /* Các phím chức năng (AC, DEL) màu xanh dương sáng */
+  --steel-text: #ffffff;
+  
+  /* CÁC PHÍM SỐ */
+  --key-num-bg: #0040A1; /* Nền phím số xanh dương trong trẻo */
+  --key-num-text: #ffffff;
+  
+  /* ĐỔ BÓNG: Mềm mại hơn vì nền đã sáng lên */
+  --shadow-key: 0 2px 0 rgba(0,0,0,0.2), 0 6px 14px rgba(0,0,0,0.15);
+  
   --radius-card: 26px;
   --radius-key: 14px;
   --font-mono: 'Space Mono', monospace;
   --font-sans: 'Manrope', sans-serif;
+}
+
+body.light {
+  /* GIAO DIỆN SÁNG (LIGHT THEME) */
+  --bg-0: #e3f2fd;       /* Trắng pha xanh dương nhạt */
+  --bg-1: #bbdefb;       /* Xanh dương nhạt làm điểm nhấn */
+  --surface: #ffffff;
+  --surface-2: #f0f7ff;
+  --border: rgba(0, 50, 100, 0.08);
+  --display-bg: #152a55;
+  --display-glow: rgba(0, 136, 255, 0.25);
+  --text-main: #102a43;
+  --text-dim: #627d98;
+  --key-num-bg: #f8fbff;
+  --key-num-text: #102a43;
+  --amber: #0066cc;      /* Chữ số hiển thị màu xanh dương đậm trong chế độ sáng */
+  --shadow-key: 0 2px 0 rgba(0,0,0,0.06), 0 6px 14px rgba(0,0,0,0.06);
 }
 
 body.light {

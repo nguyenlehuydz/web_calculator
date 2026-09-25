@@ -6,6 +6,7 @@
   const historyList = document.getElementById('historyList');
   const historyToggle = document.getElementById('historyToggle');
   const historyClear = document.getElementById('historyClear');
+  const historyClose = document.getElementById('historyClose');
   const themeToggle = document.getElementById('themeToggle');
   const copyBtn = document.getElementById('copyBtn');
   const memoryTag = document.getElementById('memoryTag');
@@ -148,6 +149,11 @@
   historyClear.addEventListener('click', () => {
     history = [];
     renderHistory();
+    historyPanel.classList.remove('open'); // <--- Lệnh này giúp đóng bảng lịch sử
+  });
+
+  historyClose.addEventListener('click', () => {
+    historyPanel.classList.remove('open');
   });
 
   historyToggle.addEventListener('click', () => {
