@@ -13,8 +13,9 @@
   const menuToggle = document.getElementById('menuToggle');
   const modeMenu = document.getElementById('modeMenu');
   const calculatorDisplay = document.querySelector('.calculator');
-  const OP_MAP = { '+': '+', '−': '-', '×': '*', '÷': '/' };
   const MAX_DIGITS = 14;
+
+  const OP_MAP = { '+': '+', '−': '-', '×': '*', '÷': '/', 'mod': 'mod', '^': '^' };
 
   // Trỏ tới 2 bàn phím khác nhau
   const keypadStandard = document.getElementById('keypad-standard');
@@ -118,6 +119,16 @@
     updateDisplay();
   }
 
+  function factorial(n) {
+    if (n < 0 || !Number.isInteger(n)) return NaN; // Chỉ tính giai thừa số nguyên dương
+    if (n === 0 || n === 1) return 1;
+    let result = 1;
+    for (let i = 2; i <= n; i++) {
+      result *= i;
+    }
+    return result;
+  }
+
   function compute() {
     if (operator === null || previous === null) return;
     const a = parseFloat(previous);
@@ -130,6 +141,8 @@
       case '/':
         if (b === 0) { current = 'Cannot divide by zero'; previous = null; operator = null; overwrite = true; updateDisplay(); return; }
         result = a / b; break;
+      case 'mod': result = a % b; break; // Thêm mod
+      case '^': result = Math.pow(a, b); break; // Thêm x^y
       default: return;
     }
     result = Math.round((result + Number.EPSILON) * 1e10) / 1e10;
@@ -258,8 +271,46 @@
       const btn = e.target.closest('.key');
       if (!btn) return;
       
-      const { num, op, action } = btn.dataset;
+      const { num, op, action, func } = btn.dataset; // Thêm func vào đây
       
+      // Xử lý các nút hàm khoa học (tác động trực tiếp lên số hiện tại)
+      if (func !== undefined) {
+        if (current === 'Lỗi') return;
+        let val = parseFloat(current);
+        let resultVal;
+
+        switch (func) {
+          case 'square': resultVal = val * val; break;
+          case 'inverse': 
+            if (val === 0) { current = 'Lỗi'; updateDisplay(); return; }
+            resultVal = 1 / val; break;
+          case 'abs': resultVal = Math.abs(val); break;
+          case 'exp': resultVal = Math.exp(val); break;
+          case 'sqrt': 
+            if (val < 0) { current = 'Lỗi'; updateDisplay(); return; }
+            resultVal = Math.sqrt(val); break;
+          case 'factorial': resultVal = factorial(val); break;
+          case 'ten-pow': resultVal = Math.pow(10, val); break;
+          case 'log': 
+            if (val <= 0) { current = 'Lỗi'; updateDisplay(); return; }
+            resultVal = Math.log10(val); break;
+          case 'ln': 
+            if (val <= 0) { current = 'Lỗi'; updateDisplay(); return; }
+            resultVal = Math.log(val); break;
+        }
+        
+        // Làm tròn lỗi số thực (VD: 0.1 + 0.2)
+        if (!isNaN(resultVal)) {
+             resultVal = Math.round((resultVal + Number.EPSILON) * 1e10) / 1e10;
+             current = String(resultVal);
+        } else {
+             current = "Lỗi";
+        }
+        overwrite = true;
+        updateDisplay();
+        return;
+      }
+
       if (num !== undefined) return inputDigit(num);
       if (op !== undefined) return chooseOperator(op);
       
@@ -268,6 +319,12 @@
         case 'delete': return deleteLast();
         case 'percent': return percent();
         case 'equals': return compute();
+        case 'toggle-sign': // Nút +/-
+             if (current !== '0' && current !== 'Lỗi') {
+                 current = current.startsWith('-') ? current.slice(1) : '-' + current;
+                 updateDisplay();
+             }
+             return;
         case 'mem-clear': 
           memory = 0; 
           return updateDisplay();
