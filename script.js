@@ -84,7 +84,7 @@
       case '-': result = a - b; break;
       case '*': result = a * b; break;
       case '/':
-        if (b === 0) { current = 'Lỗi'; previous = null; operator = null; overwrite = true; updateDisplay(); return; }
+        if (b === 0) { current = 'Cannot divide by zero'; previous = null; operator = null; overwrite = true; updateDisplay(); return; }
         result = a / b; break;
       default: return;
     }
