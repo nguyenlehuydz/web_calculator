@@ -74,9 +74,13 @@
       resultEl.style.fontSize = '22px';
     } 
     // Nếu quá dài (>16 ký tự), thu nhỏ tối đa còn 17px để hiển thị được chuỗi rất dài
-    else {
+    else if (textLength <= 20){
       resultEl.style.fontSize = '17px';
     }
+    else if (textLength <= 24){
+      resultEl.style.fontSize = '11px';
+    }
+    else resultEl.style.fontSize = '6px';
   }
 
   function formatNumber(numStr) {
