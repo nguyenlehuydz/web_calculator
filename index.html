@@ -3,54 +3,642 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SciCalc Pro — Modern Calculator</title>
-<link rel="icon" type="image/png" href="logo.png">
+<title>SciCalc Pro — Ultimate Calculator Suite</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230052D4'/><text x='50' y='65' font-size='50' font-family='sans-serif' font-weight='bold' text-anchor='middle' fill='%2300FFFF'>C</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<!-- Math.js for advanced scientific, matrix and math calculations -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.js"></script>
 </head>
 <body>
 
-<div class="stage">
-  <main class="calculator" role="application" aria-label="Máy tính">
+<div class="stage" id="stage">
 
+  <!-- SIDEBAR / DRAWER MENU -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <aside class="sidebar-drawer" id="sidebarDrawer" aria-label="Menu điều hướng">
+    <div class="sidebar-header">
+      <div class="sidebar-brand">
+        <span class="brand-icon">🧮</span>
+        <span class="brand-text">SciCalc Pro<span class="brand-dot">.</span></span>
+      </div>
+      <button class="sidebar-close-btn" id="sidebarClose" aria-label="Đóng menu">✕</button>
+    </div>
+
+    <div class="sidebar-section-title">CALCULATOR MODES</div>
+    <nav class="sidebar-menu">
+      <button class="sidebar-item active" data-mode="standard">
+        <span class="sidebar-item-icon">🧮</span>
+        <span class="sidebar-item-label">Tiêu chuẩn (Standard)</span>
+        <span class="sidebar-badge">Cơ bản</span>
+      </button>
+
+      <button class="sidebar-item" data-mode="scientific">
+        <span class="sidebar-item-icon">🔬</span>
+        <span class="sidebar-item-label">Khoa học (Scientific)</span>
+        <span class="sidebar-badge">Math.js</span>
+      </button>
+
+      <button class="sidebar-item" data-mode="programmer">
+        <span class="sidebar-item-icon">💻</span>
+        <span class="sidebar-item-label">Lập trình (Programmer)</span>
+        <span class="sidebar-badge badge-accent">64-bit</span>
+      </button>
+
+      <button class="sidebar-item" data-mode="converter">
+        <span class="sidebar-item-icon">📐</span>
+        <span class="sidebar-item-label">Chuyển đổi (Unit Converter)</span>
+        <span class="sidebar-badge">7 Đơn vị</span>
+      </button>
+
+      <button class="sidebar-item" data-mode="matrix">
+        <span class="sidebar-item-icon">🔢</span>
+        <span class="sidebar-item-label">Ma trận (Matrix Calculator)</span>
+        <span class="sidebar-badge badge-matrix">Pro</span>
+      </button>
+
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section-title">MATH & ANALYSIS</div>
+
+      <button class="sidebar-item" data-mode="equations">
+        <span class="sidebar-item-icon">⚡</span>
+        <span class="sidebar-item-label">Giải phương trình (Equation)</span>
+      </button>
+
+      <button class="sidebar-item" data-mode="statistics">
+        <span class="sidebar-item-icon">📈</span>
+        <span class="sidebar-item-label">Thống kê (Statistics)</span>
+      </button>
+
+      <button class="sidebar-item" data-mode="graph">
+        <span class="sidebar-item-icon">📊</span>
+        <span class="sidebar-item-label">Vẽ đồ thị (Graph 2D)</span>
+      </button>
+
+      <button class="sidebar-item" data-mode="finance">
+        <span class="sidebar-item-icon">💰</span>
+        <span class="sidebar-item-label">Tài chính (Finance & Lãi suất)</span>
+      </button>
+
+      <button class="sidebar-item" data-mode="datetime">
+        <span class="sidebar-item-icon">📅</span>
+        <span class="sidebar-item-label">Ngày & Giờ (Date & Time)</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="sidebar-action-btn" id="sidebarHistoryBtn">
+        <span>🕘</span> Lịch sử tính toán
+      </button>
+      <button class="sidebar-action-btn" id="sidebarSettingsBtn">
+        <span>⚙️</span> Cài đặt & Tuỳ chọn
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN CALCULATOR CARD -->
+  <main class="calculator" id="calculatorCard" role="application" aria-label="Máy tính SciCalc Pro">
+
+    <!-- COMMON HEADER -->
     <header class="calc-header">
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <button class="icon-btn" id="menuToggle">☰</button>
-        <span class="brand">SciCalc Pro<span class="brand-dot">.</span></span>
+      <div class="header-left">
+        <button class="icon-btn menu-btn" id="menuToggle" title="Mở danh mục (Sidebar)" aria-label="Mở menu">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/>
+          </svg>
+        </button>
+        <div class="brand-group">
+          <span class="mode-title" id="currentModeTitle">Standard</span>
+          <span class="brand-sub">SciCalc Pro</span>
+        </div>
       </div>
 
       <div class="header-actions">
-        <button class="icon-btn" id="historyToggle" title="Lịch sử" aria-label="Xem lịch sử">
-          <svg viewBox="0 0 24 24" width="18" height="18"><path d="M13 3a9 9 0 1 0 8.94 10H19.9A7 7 0 1 1 13 5v4l5-4.5L13 0v3z" fill="currentColor"/></svg>
+        <button class="icon-btn" id="historyToggle" title="Lịch sử tính toán" aria-label="Xem lịch sử">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+            <path d="M13 3a9 9 0 1 0 8.94 10H19.9A7 7 0 1 1 13 5v4l5-4.5L13 0v3z"/>
+          </svg>
         </button>
-        <button class="icon-btn" id="themeToggle" title="Đổi giao diện" aria-label="Đổi sáng/tối">
-          <svg viewBox="0 0 24 24" width="18" height="18" id="themeIcon"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36A5.4 5.4 0 0 1 12 3z" fill="currentColor"/></svg>
+        <button class="icon-btn" id="themeToggle" title="Đổi giao diện sáng/tối" aria-label="Đổi sáng/tối">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" id="themeIcon">
+            <path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36A5.4 5.4 0 0 1 12 3z"/>
+          </svg>
+        </button>
+        <button class="icon-btn" id="settingsToggle" title="Cài đặt" aria-label="Cài đặt">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+            <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+          </svg>
         </button>
       </div>
     </header>
 
-    <!-- Menu chọn chế độ (Ẩn mặc định) -->
-    <div class="mode-menu" id="modeMenu">
-      <button class="mode-btn active" data-mode="standard">Standard</button>
-      <button class="mode-btn" data-mode="scientific">Scientific</button>
-      <button class="mode-btn" data-mode="programmer">Programming</button>
-      <button class="mode-btn" data-mode="converter">Unit Conversion</button>
+    <!-- ======================================================== -->
+    <!-- VIEW 1 & 2: STANDARD / SCIENTIFIC DISPLAY               -->
+    <!-- ======================================================== -->
+    <div class="view-panel active" id="view-calc">
+      <section class="display" aria-live="polite">
+        <div class="memory-tag" id="memoryTag">M</div>
+        <div class="expression" id="expression">&nbsp;</div>
+        <div class="result-row">
+          <div class="result" id="result">0</div>
+          <button class="copy-btn" id="copyBtn" title="Sao chép kết quả" aria-label="Sao chép kết quả">
+            <svg viewBox="0 0 24 24" width="16" height="16"><path d="M16 1H4a2 2 0 0 0-2 2v14h2V3h12V1zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11v14z" fill="currentColor"/></svg>
+          </button>
+        </div>
+      </section>
+
+      <!-- KEYPAD: STANDARD (4 Columns) -->
+      <section class="keypad" id="keypad-standard">
+        <button class="key key-mem" data-action="mem-clear">MC</button>
+        <button class="key key-mem" data-action="mem-recall">MR</button>
+        <button class="key key-mem" data-action="mem-add">M+</button>
+        <button class="key key-mem" data-action="mem-sub">M-</button>
+        <button class="key key-fn" data-action="clear">AC</button>
+        <button class="key key-fn" data-action="delete">DEL</button>
+        <button class="key key-fn" data-action="percent">%</button>
+        <button class="key key-op" data-op="÷">÷</button>
+        <button class="key key-num" data-num="7">7</button>
+        <button class="key key-num" data-num="8">8</button>
+        <button class="key key-num" data-num="9">9</button>
+        <button class="key key-op" data-op="×">×</button>
+        <button class="key key-num" data-num="4">4</button>
+        <button class="key key-num" data-num="5">5</button>
+        <button class="key key-num" data-num="6">6</button>
+        <button class="key key-op" data-op="−">−</button>
+        <button class="key key-num" data-num="1">1</button>
+        <button class="key key-num" data-num="2">2</button>
+        <button class="key key-num" data-num="3">3</button>
+        <button class="key key-op" data-op="+">+</button>
+        <button class="key key-num key-zero" data-num="0">0</button>
+        <button class="key key-num" data-num=".">.</button>
+        <button class="key key-equals" data-action="equals">=</button>
+      </section>
+
+      <!-- KEYPAD: SCIENTIFIC (5 Columns) -->
+      <section class="keypad" id="keypad-scientific" style="display: none; grid-template-columns: repeat(5, 1fr);">
+        <!-- Hàng 1 -->
+        <button class="key key-sci" data-action="deg-rad" id="sciAngleUnitBtn">DEG</button>
+        <button class="key key-sci" data-num="3.141592653589793" data-kind="const">π</button>
+        <button class="key key-sci" data-num="2.718281828459045" data-kind="const">e</button>
+        <button class="key key-fn" data-action="clear">C</button>
+        <button class="key key-fn" data-action="delete">⌫</button>
+        
+        <!-- Hàng 2 -->
+        <button class="key key-sci" data-func="square">x²</button>
+        <button class="key key-sci" data-func="inverse">1/x</button>
+        <button class="key key-sci" data-func="abs">|x|</button>
+        <button class="key key-sci" data-func="exp">exp</button>
+        <button class="key key-op" data-op="mod">mod</button>
+        
+        <!-- Hàng 3 -->
+        <button class="key key-sci" data-func="sqrt">√x</button>
+        <button class="key key-sci" data-action="open-paren">(</button>
+        <button class="key key-sci" data-action="close-paren">)</button>
+        <button class="key key-sci" data-func="factorial">n!</button>
+        <button class="key key-op" data-op="÷">÷</button>
+        
+        <!-- Hàng 4 -->
+        <button class="key key-sci" data-op="^">xʸ</button>
+        <button class="key key-num" data-num="7">7</button>
+        <button class="key key-num" data-num="8">8</button>
+        <button class="key key-num" data-num="9">9</button>
+        <button class="key key-op" data-op="×">×</button>
+        
+        <!-- Hàng 5 -->
+        <button class="key key-sci" data-func="ten-pow">10ˣ</button>
+        <button class="key key-num" data-num="4">4</button>
+        <button class="key key-num" data-num="5">5</button>
+        <button class="key key-num" data-num="6">6</button>
+        <button class="key key-op" data-op="−">−</button>
+        
+        <!-- Hàng 6 -->
+        <button class="key key-sci" data-func="log">log</button>
+        <button class="key key-num" data-num="1">1</button>
+        <button class="key key-num" data-num="2">2</button>
+        <button class="key key-num" data-num="3">3</button>
+        <button class="key key-op" data-op="+">+</button>
+        
+        <!-- Hàng 7 -->
+        <button class="key key-sci" data-func="ln">ln</button>
+        <button class="key key-sci" data-action="toggle-sign">+/-</button>
+        <button class="key key-num" data-num="0">0</button>
+        <button class="key key-num" data-num=".">.</button>
+        <button class="key key-equals" data-action="equals">=</button>
+      </section>
     </div>
 
-    <section class="display" aria-live="polite">
-      <div class="memory-tag" id="memoryTag">M</div>
-      <div class="expression" id="expression">&nbsp;</div>
-      <div class="result-row">
-        <div class="result" id="result">0</div>
-        <button class="copy-btn" id="copyBtn" title="Sao chép kết quả" aria-label="Sao chép kết quả">
-          <svg viewBox="0 0 24 24" width="16" height="16"><path d="M16 1H4a2 2 0 0 0-2 2v14h2V3h12V1zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11v14z" fill="currentColor"/></svg>
-        </button>
-      </div>
-    </section>
+    <!-- ======================================================== -->
+    <!-- VIEW 3: PROGRAMMER MODE (IMAGE 1 REPLICA)               -->
+    <!-- ======================================================== -->
+    <div class="view-panel" id="view-programmer">
+      <div class="prog-container">
+        <!-- Main Value Display -->
+        <div class="prog-main-display">
+          <div class="prog-expression" id="progExpr">&nbsp;</div>
+          <div class="prog-value-wrapper">
+            <span class="prog-value" id="progMainValue">0</span>
+            <button class="copy-btn" id="progCopyBtn" title="Sao chép">
+              <svg viewBox="0 0 24 24" width="16" height="16"><path d="M16 1H4a2 2 0 0 0-2 2v14h2V3h12V1zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11v14z" fill="currentColor"/></svg>
+            </button>
+          </div>
+        </div>
 
+        <!-- 4 Base Rows (HEX, DEC, OCT, BIN) -->
+        <div class="prog-bases-list">
+          <div class="prog-base-row" data-base="HEX" id="row-HEX">
+            <span class="base-label">HEX</span>
+            <span class="base-val" id="val-HEX">0</span>
+          </div>
+          <div class="prog-base-row active" data-base="DEC" id="row-DEC">
+            <span class="base-label">DEC</span>
+            <span class="base-val" id="val-DEC">0</span>
+          </div>
+          <div class="prog-base-row" data-base="OCT" id="row-OCT">
+            <span class="base-label">OCT</span>
+            <span class="base-val" id="val-OCT">0</span>
+          </div>
+          <div class="prog-base-row" data-base="BIN" id="row-BIN">
+            <span class="base-label">BIN</span>
+            <span class="base-val" id="val-BIN">0</span>
+          </div>
+        </div>
+
+        <!-- Toolbar: Bit toggle icon, Word size, Memory -->
+        <div class="prog-toolbar">
+          <div class="prog-toolbar-left">
+            <button class="prog-tool-btn active" id="progKeypadToggle" title="Bàn phím phím số">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M20 5H4c-1.1 0-1.99.9-1.99 2L2 17c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-9 3h2v2h-2V8zm0 3h2v2h-2v-2zM8 8h2v2H8V8zm0 3h2v2H8v-2zm-1 5H5v-2h2v2zm0-3H5v-2h2v2zm0-3H5V8h2v2zm9 7h-6v-2h6v2zm0-4h-2v-2h2v2zm0-3h-2V8h2v2zm3 7h-2v-2h2v2zm0-3h-2v-2h2v2zm0-3h-2V8h2v2z"/></svg>
+            </button>
+            <button class="prog-tool-btn" id="progBitToggleBtn" title="Chế độ xem bit (Bit View)">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><circle cx="6" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="18" cy="12" r="2"/><circle cx="12" cy="6" r="2"/><circle cx="12" cy="18" r="2"/></svg>
+            </button>
+            <button class="prog-word-btn" id="progWordSizeBtn" title="Đổi kích thước Word (BYTE, WORD, DWORD, QWORD)">QWORD</button>
+          </div>
+          <div class="prog-toolbar-right">
+            <button class="prog-mem-btn" id="progMsBtn">MS</button>
+            <button class="prog-mem-btn" id="progMrBtn">M∨</button>
+          </div>
+        </div>
+
+        <!-- Bit toggler panel (hidden by default) -->
+        <div class="prog-bit-panel" id="progBitPanel" style="display: none;">
+          <div class="bit-grid" id="bitGrid"></div>
+        </div>
+
+        <!-- Dropdown bar: Bitwise & Bit shift -->
+        <div class="prog-ops-bar">
+          <div class="dropdown-wrapper">
+            <button class="dropdown-btn" id="progBitwiseMenuBtn">
+              <span class="btn-icon">⚡</span>
+              <span>Bitwise</span>
+              <span class="caret">▼</span>
+            </button>
+            <div class="dropdown-menu" id="progBitwiseMenu">
+              <button class="dropdown-item" data-prog-op="AND">AND</button>
+              <button class="dropdown-item" data-prog-op="OR">OR</button>
+              <button class="dropdown-item" data-prog-op="NOT">NOT (~)</button>
+              <button class="dropdown-item" data-prog-op="XOR">XOR (^)</button>
+              <button class="dropdown-item" data-prog-op="NAND">NAND</button>
+              <button class="dropdown-item" data-prog-op="NOR">NOR</button>
+            </div>
+          </div>
+
+          <div class="dropdown-wrapper">
+            <button class="dropdown-btn" id="progBitShiftMenuBtn">
+              <span class="btn-icon">⇋</span>
+              <span>Bit shift</span>
+              <span class="caret">▼</span>
+            </button>
+            <div class="dropdown-menu" id="progBitShiftMenu">
+              <button class="dropdown-item" data-prog-shift="LSH">Left Shift (&lt;&lt;)</button>
+              <button class="dropdown-item" data-prog-shift="RSH">Right Shift (&gt;&gt;)</button>
+              <button class="dropdown-item" data-prog-shift="ROL">Rotate Left (RoL)</button>
+              <button class="dropdown-item" data-prog-shift="ROR">Rotate Right (RoR)</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Programmer Keypad (5 columns x 6 rows) matching Image 1 -->
+        <section class="prog-keypad" id="progKeypad">
+          <!-- Row 1 -->
+          <button class="key key-hex" data-prog-key="A">A</button>
+          <button class="key key-shift" data-prog-shift="LSH">&lt;&lt;</button>
+          <button class="key key-shift" data-prog-shift="RSH">&gt;&gt;</button>
+          <button class="key key-fn" data-prog-action="clear">C</button>
+          <button class="key key-fn" data-prog-action="delete">⌫</button>
+
+          <!-- Row 2 -->
+          <button class="key key-hex" data-prog-key="B">B</button>
+          <button class="key key-sci" data-prog-paren="(">(</button>
+          <button class="key key-sci" data-prog-paren=")">)</button>
+          <button class="key key-op" data-prog-op="MOD">%</button>
+          <button class="key key-op" data-prog-op="÷">÷</button>
+
+          <!-- Row 3 -->
+          <button class="key key-hex" data-prog-key="C">C</button>
+          <button class="key key-num" data-prog-key="7">7</button>
+          <button class="key key-num" data-prog-key="8">8</button>
+          <button class="key key-num" data-prog-key="9">9</button>
+          <button class="key key-op" data-prog-op="×">×</button>
+
+          <!-- Row 4 -->
+          <button class="key key-hex" data-prog-key="D">D</button>
+          <button class="key key-num" data-prog-key="4">4</button>
+          <button class="key key-num" data-prog-key="5">5</button>
+          <button class="key key-num" data-prog-key="6">6</button>
+          <button class="key key-op" data-prog-op="−">−</button>
+
+          <!-- Row 5 -->
+          <button class="key key-hex" data-prog-key="E">E</button>
+          <button class="key key-num" data-prog-key="1">1</button>
+          <button class="key key-num" data-prog-key="2">2</button>
+          <button class="key key-num" data-prog-key="3">3</button>
+          <button class="key key-op" data-prog-op="+">+</button>
+
+          <!-- Row 6 -->
+          <button class="key key-hex" data-prog-key="F">F</button>
+          <button class="key key-fn" data-prog-action="toggle-sign">+/-</button>
+          <button class="key key-num" data-prog-key="0">0</button>
+          <button class="key key-num key-disabled" data-prog-key="." disabled>.</button>
+          <button class="key key-equals prog-equals" data-prog-action="equals">=</button>
+        </section>
+      </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- VIEW 4: UNIT CONVERTER (IMAGE 2 REPLICA)                 -->
+    <!-- ======================================================== -->
+    <div class="view-panel" id="view-converter">
+      <div class="conv-container">
+        <!-- Category Selector -->
+        <div class="conv-category-bar">
+          <label for="convCategorySelect" class="conv-cat-label">Danh mục:</label>
+          <select id="convCategorySelect" class="conv-cat-select">
+            <option value="volume">Thể tích (Volume)</option>
+            <option value="length">Chiều dài (Length)</option>
+            <option value="weight">Khối lượng (Weight)</option>
+            <option value="temperature">Nhiệt độ (Temperature)</option>
+            <option value="area">Diện tích (Area)</option>
+            <option value="speed">Tốc độ (Speed)</option>
+            <option value="time">Thời gian (Time)</option>
+          </select>
+        </div>
+
+        <!-- Displays: Top & Bottom matching Image 2 -->
+        <div class="conv-display-wrapper">
+          <!-- Top Unit Row -->
+          <div class="conv-unit-block active" id="convTopBlock">
+            <div class="conv-val" id="convTopVal">0</div>
+            <div class="conv-select-row">
+              <select id="convTopUnitSelect" class="conv-unit-select"></select>
+            </div>
+          </div>
+
+          <!-- Swap Button in middle -->
+          <div class="conv-swap-row">
+            <button class="conv-swap-btn" id="convSwapBtn" title="Đảo đổi 2 đơn vị">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                <path d="M16 17.01V10h-2v7.01h-3L15 21l4-3.99h-3zM9 3L5 6.99h3V14h2V6.99h3L9 3z"/>
+              </svg>
+            </button>
+            <div class="conv-formula" id="convFormulaText">1 mL = 0.202884 tsp</div>
+          </div>
+
+          <!-- Bottom Unit Row -->
+          <div class="conv-unit-block" id="convBottomBlock">
+            <div class="conv-val" id="convBottomVal">0</div>
+            <div class="conv-select-row">
+              <select id="convBottomUnitSelect" class="conv-unit-select"></select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Converter Keypad (3 cols x 5 rows) matching Image 2 -->
+        <section class="conv-keypad" id="convKeypad">
+          <div class="key-placeholder"></div>
+          <button class="key key-fn" data-conv-action="clear-entry">CE</button>
+          <button class="key key-fn" data-conv-action="delete">⌫</button>
+
+          <button class="key key-num" data-conv-num="7">7</button>
+          <button class="key key-num" data-conv-num="8">8</button>
+          <button class="key key-num" data-conv-num="9">9</button>
+
+          <button class="key key-num" data-conv-num="4">4</button>
+          <button class="key key-num" data-conv-num="5">5</button>
+          <button class="key key-num" data-conv-num="6">6</button>
+
+          <button class="key key-num" data-conv-num="1">1</button>
+          <button class="key key-num" data-conv-num="2">2</button>
+          <button class="key key-num" data-conv-num="3">3</button>
+
+          <button class="key key-fn" data-conv-action="toggle-sign">+/-</button>
+          <button class="key key-num" data-conv-num="0">0</button>
+          <button class="key key-num" data-conv-num=".">.</button>
+        </section>
+      </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- VIEW 5: MATRIX CALCULATOR                                -->
+    <!-- ======================================================== -->
+    <div class="view-panel" id="view-matrix">
+      <div class="matrix-container">
+        <!-- Tab selector for Matrix A & Matrix B -->
+        <div class="matrix-tabs">
+          <button class="matrix-tab-btn active" data-matrix-tab="A">Ma trận A</button>
+          <button class="matrix-tab-btn" data-matrix-tab="B">Ma trận B</button>
+          <button class="matrix-tab-btn" data-matrix-tab="RESULT">Kết quả R</button>
+        </div>
+
+        <!-- Matrix A & B Panels -->
+        <div class="matrix-editor-area">
+          <!-- Dimension Controls for current matrix -->
+          <div class="matrix-dim-bar">
+            <span class="matrix-current-label" id="matrixCurrentLabel">Ma trận A:</span>
+            <div class="dim-inputs">
+              <label>Dòng:</label>
+              <select id="matrixRowsSelect" class="dim-select">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3" selected>3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select>
+              <span>×</span>
+              <label>Cột:</label>
+              <select id="matrixColsSelect" class="dim-select">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3" selected>3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select>
+            </div>
+
+            <!-- Quick presets -->
+            <div class="matrix-presets">
+              <button class="chip-btn" data-preset="2x2">2×2</button>
+              <button class="chip-btn" data-preset="3x3">3×3</button>
+              <button class="chip-btn" data-preset="4x4">4×4</button>
+              <button class="chip-btn" id="matrixIdentityBtn">I</button>
+              <button class="chip-btn" id="matrixRandomBtn">🎲</button>
+              <button class="chip-btn" id="matrixClearBtn">Xóa</button>
+            </div>
+          </div>
+
+          <!-- Interactive Grid for Matrix Input -->
+          <div class="matrix-grid-card">
+            <div class="matrix-bracket-left">[</div>
+            <div class="matrix-grid" id="matrixGrid"></div>
+            <div class="matrix-bracket-right">]</div>
+          </div>
+        </div>
+
+        <!-- Matrix Operations Actions -->
+        <div class="matrix-actions-wrapper">
+          <div class="matrix-action-group">
+            <span class="group-title">Phép toán 2 Ma trận (A & B)</span>
+            <div class="matrix-op-grid">
+              <button class="key key-op matrix-btn" data-matrix-op="add">A + B</button>
+              <button class="key key-op matrix-btn" data-matrix-op="subtract">A − B</button>
+              <button class="key key-op matrix-btn" data-matrix-op="multiply">A × B</button>
+            </div>
+          </div>
+
+          <div class="matrix-action-group">
+            <span class="group-title">Phép toán Đơn Ma trận (trên A)</span>
+            <div class="matrix-op-grid single-ops">
+              <button class="key key-sci matrix-btn" data-matrix-single="det">det(A)</button>
+              <button class="key key-sci matrix-btn" data-matrix-single="inv">A⁻¹ (Inverse)</button>
+              <button class="key key-sci matrix-btn" data-matrix-single="transpose">Aᵀ (Transpose)</button>
+              <button class="key key-sci matrix-btn" data-matrix-single="rank">rank(A)</button>
+              <button class="key key-sci matrix-btn" data-matrix-single="eigenvalues">λ (Eigenvalues)</button>
+              <button class="key key-sci matrix-btn" data-matrix-single="trace">Trace(A)</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Result Box -->
+        <div class="matrix-result-box" id="matrixResultBox">
+          <div class="matrix-result-head">
+            <span class="result-title" id="matrixResultTitle">Kết quả tính toán</span>
+            <div class="result-head-actions">
+              <button class="chip-btn" id="matrixUseAsABtn">Chép vào A</button>
+              <button class="chip-btn" id="matrixUseAsBBtn">Chép vào B</button>
+              <button class="chip-btn" id="matrixCopyResultBtn">Sao chép</button>
+            </div>
+          </div>
+          <div class="matrix-result-body" id="matrixResultBody">
+            <div class="matrix-result-empty">Chọn một phép toán ma trận ở trên để xem kết quả</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- VIEW 6: EQUATION SOLVER (ROADMAP PHASE 1)                -->
+    <!-- ======================================================== -->
+    <div class="view-panel" id="view-equations">
+      <div class="extra-tool-container">
+        <div class="tool-subtabs">
+          <button class="chip-btn active" data-eq-type="linear">Bậc 1 (ax + b = 0)</button>
+          <button class="chip-btn" data-eq-type="quadratic">Bậc 2 (ax² + bx + c = 0)</button>
+          <button class="chip-btn" data-eq-type="system2">Hệ 2 ẩn</button>
+        </div>
+
+        <div class="eq-body" id="eqBody">
+          <!-- Will be rendered dynamically -->
+        </div>
+
+        <div class="eq-result-card" id="eqResultCard">
+          <span class="res-label">Nghiệm của phương trình:</span>
+          <div class="res-content" id="eqResultContent">Nhập hệ số và bấm "Giải phương trình"</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- VIEW 7: STATISTICS (ROADMAP PHASE 1)                     -->
+    <!-- ======================================================== -->
+    <div class="view-panel" id="view-statistics">
+      <div class="extra-tool-container">
+        <label class="stat-label">Nhập dãy số mẫu (cách nhau bởi dấu phẩy hoặc khoảng trắng):</label>
+        <textarea class="stat-textarea" id="statInput" placeholder="Ví dụ: 12, 15, 23, 23, 16, 19, 24, 26, 30"></textarea>
+        
+        <div class="stat-actions">
+          <button class="chip-btn" id="statSampleBtn">Điền mẫu</button>
+          <button class="chip-btn" id="statClearBtn">Xóa dữ liệu</button>
+        </div>
+
+        <div class="stat-grid" id="statGrid">
+          <div class="stat-card"><span class="lbl">Số phần tử (n)</span><span class="val" id="statCount">0</span></div>
+          <div class="stat-card"><span class="lbl">Tổng (Σx)</span><span class="val" id="statSum">0</span></div>
+          <div class="stat-card"><span class="lbl">Trung bình (Mean)</span><span class="val" id="statMean">0</span></div>
+          <div class="stat-card"><span class="lbl">Trung vị (Median)</span><span class="val" id="statMedian">0</span></div>
+          <div class="stat-card"><span class="lbl">Yếu vị (Mode)</span><span class="val" id="statMode">0</span></div>
+          <div class="stat-card"><span class="lbl">Độ lệch chuẩn (σ)</span><span class="val" id="statStdDev">0</span></div>
+          <div class="stat-card"><span class="lbl">Phương sai (σ²)</span><span class="val" id="statVariance">0</span></div>
+          <div class="stat-card"><span class="lbl">Min / Max</span><span class="val" id="statMinMax">0 / 0</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- VIEW 8: GRAPH 2D                                         -->
+    <!-- ======================================================== -->
+    <div class="view-panel" id="view-graph">
+      <div class="extra-tool-container">
+        <div class="graph-input-row">
+          <label>f(x) =</label>
+          <input type="text" id="graphFuncInput" class="graph-input" value="sin(x)">
+          <button class="key key-op" id="graphPlotBtn" style="padding: 6px 16px; font-size: 14px;">Vẽ</button>
+        </div>
+        <div class="graph-presets">
+          <button class="chip-btn" data-graph="sin(x)">sin(x)</button>
+          <button class="chip-btn" data-graph="cos(x)">cos(x)</button>
+          <button class="chip-btn" data-graph="x^2 - 4">x² - 4</button>
+          <button class="chip-btn" data-graph="1/x">1/x</button>
+          <button class="chip-btn" data-graph="sqrt(x)">√x</button>
+        </div>
+        <div class="graph-canvas-wrapper">
+          <canvas id="graphCanvas" width="400" height="300"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- VIEW 9: FINANCE & DATE-TIME PLACEHOLDERS                -->
+    <!-- ======================================================== -->
+    <div class="view-panel" id="view-finance">
+      <div class="extra-tool-container">
+        <div class="finance-card">
+          <h4>💰 Tính lãi kép (Compound Interest)</h4>
+          <div class="form-row"><label>Số tiền gốc (VND):</label><input type="number" id="finPrincipal" value="100000000"></div>
+          <div class="form-row"><label>Lãi suất năm (%):</label><input type="number" id="finRate" value="6.5" step="0.1"></div>
+          <div class="form-row"><label>Thời hạn (năm):</label><input type="number" id="finYears" value="5"></div>
+          <button class="key key-equals" id="finCalcBtn" style="width: 100%; margin-top: 10px;">Tính tiền nhận được</button>
+          <div class="fin-result" id="finResult" style="margin-top: 12px; font-weight: bold; color: var(--amber); text-align: center;">--</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="view-panel" id="view-datetime">
+      <div class="extra-tool-container">
+        <div class="finance-card">
+          <h4>📅 Tính khoảng cách giữa hai ngày</h4>
+          <div class="form-row"><label>Từ ngày:</label><input type="date" id="dateStart"></div>
+          <div class="form-row"><label>Đến ngày:</label><input type="date" id="dateEnd"></div>
+          <button class="key key-equals" id="dateCalcBtn" style="width: 100%; margin-top: 10px;">Tính khoảng cách</button>
+          <div class="fin-result" id="dateResult" style="margin-top: 12px; font-weight: bold; color: var(--amber); text-align: center;">--</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- HISTORY PANEL (RIGHT SLIDE-OVER)                         -->
+    <!-- ======================================================== -->
     <aside class="history-panel" id="historyPanel">
       <div class="history-head">
         <span>Lịch sử tính toán</span>
@@ -64,85 +652,67 @@
       </ul>
     </aside>
 
-    <section class="keypad" id="keypad-standard">
-      <button class="key key-mem" data-action="mem-clear">MC</button>
-      <button class="key key-mem" data-action="mem-recall">MR</button>
-      <button class="key key-mem" data-action="mem-add">M+</button>
-      <button class="key key-mem" data-action="mem-sub">M-</button>
-      <button class="key key-fn" data-action="clear">AC</button>
-      <button class="key key-fn" data-action="delete">DEL</button>
-      <button class="key key-fn" data-action="percent">%</button>
-      <button class="key key-op" data-op="÷">÷</button>
-      <button class="key key-num" data-num="7">7</button>
-      <button class="key key-num" data-num="8">8</button>
-      <button class="key key-num" data-num="9">9</button>
-      <button class="key key-op" data-op="×">×</button>
-      <button class="key key-num" data-num="4">4</button>
-      <button class="key key-num" data-num="5">5</button>
-      <button class="key key-num" data-num="6">6</button>
-      <button class="key key-op" data-op="−">−</button>
-      <button class="key key-num" data-num="1">1</button>
-      <button class="key key-num" data-num="2">2</button>
-      <button class="key key-num" data-num="3">3</button>
-      <button class="key key-op" data-op="+">+</button>
-      <button class="key key-num key-zero" data-num="0">0</button>
-      <button class="key key-num" data-num=".">.</button>
-      <button class="key key-equals" data-action="equals">=</button>
-    </section>
-
-    <!-- BÀN PHÍM KHOA HỌC (5 Cột, ẩn mặc định) -->
-    <section class="keypad" id="keypad-scientific" style="display: none; grid-template-columns: repeat(5, 1fr);">
-      <!-- Hàng 1 -->
-      <button class="key key-sci" data-action="2nd">2nd</button>
-      <button class="key key-sci" data-num="3.141592653589793" data-kind="const">π</button>
-      <button class="key key-sci" data-num="2.718281828459045" data-kind="const">e</button>
-      <button class="key key-fn" data-action="clear">C</button>
-      <button class="key key-fn" data-action="delete">⌫</button>
-      
-      <!-- Hàng 2 -->
-      <button class="key key-sci" data-func="square">x²</button>
-      <button class="key key-sci" data-func="inverse">1/x</button>
-      <button class="key key-sci" data-func="abs">|x|</button>
-      <button class="key key-sci" data-func="exp">exp</button>
-      <button class="key key-op" data-op="mod">mod</button>
-      
-      <!-- Hàng 3 -->
-      <button class="key key-sci" data-func="sqrt">√x</button>
-      <button class="key key-sci" data-action="open-paren">(</button>
-      <button class="key key-sci" data-action="close-paren">)</button>
-      <button class="key key-sci" data-func="factorial">n!</button>
-      <button class="key key-op" data-op="÷">÷</button>
-      
-      <!-- Hàng 4 -->
-      <button class="key key-sci" data-op="^">xʸ</button>
-      <button class="key key-num" data-num="7">7</button>
-      <button class="key key-num" data-num="8">8</button>
-      <button class="key key-num" data-num="9">9</button>
-      <button class="key key-op" data-op="×">×</button>
-      
-      <!-- Hàng 5 -->
-      <button class="key key-sci" data-func="ten-pow">10ˣ</button>
-      <button class="key key-num" data-num="4">4</button>
-      <button class="key key-num" data-num="5">5</button>
-      <button class="key key-num" data-num="6">6</button>
-      <button class="key key-op" data-op="−">−</button>
-      
-      <!-- Hàng 6 -->
-      <button class="key key-sci" data-func="log">log</button>
-      <button class="key key-num" data-num="1">1</button>
-      <button class="key key-num" data-num="2">2</button>
-      <button class="key key-num" data-num="3">3</button>
-      <button class="key key-op" data-op="+">+</button>
-      
-      <!-- Hàng 7 -->
-      <button class="key key-sci" data-func="ln">ln</button>
-      <button class="key key-sci" data-action="toggle-sign">+/-</button>
-      <button class="key key-num" data-num="0">0</button>
-      <button class="key key-num" data-num=".">.</button>
-      <button class="key key-equals" data-action="equals">=</button>
-    </section>
-
   </main>
+</div>
+
+<!-- ======================================================== -->
+<!-- SETTINGS MODAL                                           -->
+<!-- ======================================================== -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3>⚙️ Cài đặt & Tuỳ chọn</h3>
+      <button class="modal-close" id="settingsClose">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="setting-item">
+        <div>
+          <strong>Âm thanh phản hồi (Click Sound)</strong>
+          <p class="setting-desc">Phát âm thanh mô phỏng phím bấm khi click</p>
+        </div>
+        <input type="checkbox" id="settingSoundToggle" checked class="switch">
+      </div>
+
+      <div class="setting-item">
+        <div>
+          <strong>Giao diện nền sáng (Light Theme)</strong>
+          <p class="setting-desc">Chuyển đổi giao diện sáng / tối</p>
+        </div>
+        <input type="checkbox" id="settingThemeToggle" class="switch">
+      </div>
+
+      <div class="setting-item">
+        <div>
+          <strong>Góc lượng giác (Khoa học)</strong>
+          <p class="setting-desc">Đơn vị đo lường góc trong hàm sin, cos, tan</p>
+        </div>
+        <select id="settingAngleUnit" class="setting-select">
+          <option value="DEG">Degrees (Độ)</option>
+          <option value="RAD">Radians (Rad)</option>
+        </select>
+      </div>
+
+      <div class="setting-item">
+        <div>
+          <strong>Số chữ số thập phân hiển thị</strong>
+          <p class="setting-desc">Độ chính xác làm tròn</p>
+        </div>
+        <select id="settingPrecision" class="setting-select">
+          <option value="4">4 chữ số</option>
+          <option value="6">6 chữ số</option>
+          <option value="8">8 chữ số</option>
+          <option value="10" selected>10 chữ số</option>
+        </select>
+      </div>
+
+      <div class="roadmap-box">
+        <strong>🚀 Lộ trình phát triển (Roadmap):</strong>
+        <p>• <b>Phase 1</b>: Equation Solver ✓, Unit Converter ✓, Statistics ✓, Matrix ✓</p>
+        <p>• <b>Phase 2</b>: Graphing 2D ✓, Programmer Mode ✓, Complex Numbers, Numerical Methods</p>
+        <p>• <b>Phase 3</b>: Step-by-step Explanation, Share calculation, QR code, PWA Offline</p>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script src="script.js"></script>
